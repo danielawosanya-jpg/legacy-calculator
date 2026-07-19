@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Real Receipt — Luxury vs. Legacy</title>
+<meta name="description" content="See what that purchase really cost your child. Enter the price, get the receipt.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#141414;
+    --paper:#EFE9DC;
+    --receipt:#FAF7EF;
+    --green:#1F6B3B;
+    --gold:#C9A227;
+    --red:#B3372E;
+    --gray:#6E6A62;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Work Sans',system-ui,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+  /* ---------- header ---------- */
+  header{padding:28px 0 0}
+  .brand{
+    display:flex;align-items:baseline;gap:10px;
+    font-family:'Anton',sans-serif;letter-spacing:.04em;
+    text-transform:uppercase;font-size:15px;
+  }
+  .brand .lux{color:var(--paper)}
+  .brand .strike{position:relative;color:#8a8378}
+  .brand .strike::after{
+    content:"";position:absolute;left:-2%;top:52%;width:104%;height:2px;
+    background:var(--red);transform:rotate(-4deg);
+  }
+  .brand .leg{color:var(--gold)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 40px;max-width:820px}
+  .hero h1{
+    font-family:'Anton',sans-serif;
+    font-size:clamp(2.4rem,7vw,4.6rem);
+    line-height:1.02;letter-spacing:.005em;
+    text-transform:uppercase;
+  }
+  .hero h1 .price-tag{
+    color:var(--gold);
+    white-space:nowrap;
+  }
+  .hero p{
+    margin-top:18px;font-size:clamp(1rem,2.2vw,1.15rem);
+    color:#cfc8ba;max-width:56ch;
+  }
+  .hero p strong{color:var(--paper)}
+
+  /* ---------- calculator card ---------- */
+  .calc{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    margin:24px 0 80px;border:1px solid #2c2c2c;border-radius:8px;overflow:hidden;
+    background:#1b1b1b;
+  }
+  @media (max-width:820px){.calc{grid-template-columns:1fr}}
+
+  .panel{padding:36px 32px}
+  .panel h2{
+    font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--gold);margin-bottom:22px;
+  }
+  .field{margin-bottom:22px}
+  label{display:block;font-size:.8rem;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;color:#a79f90;margin-bottom:8px}
+  .money-input{position:relative}
+  .money-input span{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    font-family:'Courier Prime',monospace;font-weight:700;color:var(--gold);font-size:1.2rem;
+  }
+  input[type=number]{
+    width:100%;padding:14px 14px 14px 34px;font-size:1.25rem;
+    font-family:'Courier Prime',monospace;font-weight:700;
+    background:var(--ink);color:var(--paper);
+    border:1px solid #3a3a3a;border-radius:6px;
+  }
+  input[type=number].no-prefix{padding-left:14px}
+  input[type=number]:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield;appearance:textfield}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{
+    font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:7px 12px;border-radius:99px;cursor:pointer;
+    background:transparent;color:#cfc8ba;border:1px solid #3f3f3f;
+    transition:border-color .15s,color .15s;
+  }
+  .chip:hover{border-color:var(--gold);color:var(--gold)}
+  .chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .rate-row{display:flex;gap:8px}
+  .rate{
+    flex:1;text-align:center;padding:10px 4px;border-radius:6px;cursor:pointer;
+    background:transparent;border:1px solid #3a3a3a;color:#cfc8ba;
+    font-family:'Courier Prime',monospace;font-weight:700;font-size:.95rem;
+  }
+  .rate[aria-pressed=true]{background:var(--green);border-color:var(--green);color:#fff}
+  .rate:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .rate small{display:block;font-family:'Work Sans',sans-serif;font-weight:500;
+    font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;margin-top:2px;opacity:.8}
+
+  .run{
+    width:100%;margin-top:6px;padding:16px;
+    font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.09em;text-transform:uppercase;
+    background:var(--gold);color:var(--ink);border:none;border-radius:6px;cursor:pointer;
+    transition:transform .12s;
+  }
+  .run:hover{transform:translateY(-1px)}
+  .run:active{transform:translateY(0)}
+  .run:focus-visible{outline:3px solid var(--paper);outline-offset:2px}
+
+  /* ---------- receipt (signature) ---------- */
+  .receipt-side{
+    background:
+      radial-gradient(circle at 20% 10%, rgba(201,162,39,.06), transparent 45%),
+      #232323;
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:36px 26px;
+  }
+  .receipt{
+    width:100%;max-width:360px;
+    background:var(--receipt);color:#242018;
+    font-family:'Courier Prime',monospace;
+    padding:26px 22px 34px;
+    box-shadow:0 18px 40px rgba(0,0,0,.5);
+    /* perforated bottom edge */
+    -webkit-mask:
+      linear-gradient(#000 0 0) top/100% calc(100% - 12px) no-repeat,
+      radial-gradient(circle 7px at 7px 6px,#0000 98%,#000) bottom left/14px 12px repeat-x;
+            mask:
+      linear-gradient(#000 0 0) top/100% calc(100% - 12px) no-repeat,
+      radial-gradient(circle 7px at 7px 6px,#0000 98%,#000) bottom left/14px 12px repeat-x;
+  }
+  .receipt.printing{animation:printout .7s ease-out}
+  @keyframes printout{
+    from{clip-path:inset(0 0 100% 0);transform:translateY(-14px)}
+    to{clip-path:inset(0 0 0 0);transform:translateY(0)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .receipt.printing{animation:none}
+    .run,.chip{transition:none}
+  }
+  .r-head{text-align:center;border-bottom:1px dashed #9c927d;padding-bottom:12px;margin-bottom:12px}
+  .r-head .r-store{font-weight:700;font-size:1.02rem;letter-spacing:.05em}
+  .r-head .r-sub{font-size:.72rem;letter-spacing:.14em;margin-top:2px}
+  .r-line{display:flex;justify-content:space-between;font-size:.86rem;padding:3px 0}
+  .r-line.total{font-weight:700;font-size:.95rem;border-top:1px dashed #9c927d;margin-top:8px;padding-top:9px}
+  .r-line .neg{color:var(--red);font-weight:700}
+  .r-line .pos{color:var(--green);font-weight:700}
+  .r-section{font-size:.68rem;letter-spacing:.16em;margin:14px 0 4px;color:#6d6350}
+  .r-note{border-top:1px dashed #9c927d;margin-top:14px;padding-top:10px;
+    font-size:.72rem;line-height:1.5;color:#584f3f;text-align:center}
+  .r-note b{color:#242018}
+  .barcode{
+    margin:14px auto 0;height:34px;width:78%;
+    background:repeating-linear-gradient(90deg,#242018 0 2px,transparent 2px 4px,#242018 4px 7px,transparent 7px 9px);
+  }
+  .r-empty{text-align:center;color:#6d6350;font-size:.85rem;padding:26px 6px}
+
+  /* ---------- monthly flip ---------- */
+  .flip{margin:0 0 90px;max-width:820px}
+  .flip h3{font-family:'Anton',sans-serif;font-size:clamp(1.5rem,4vw,2.2rem);
+    text-transform:uppercase;line-height:1.1}
+  .flip h3 em{font-style:normal;color:var(--gold)}
+  .flip p{margin-top:12px;color:#cfc8ba;max-width:58ch}
+  .flip .monthly-out{
+    margin-top:18px;font-family:'Courier Prime',monospace;font-weight:700;
+    font-size:clamp(1.1rem,3vw,1.5rem);color:var(--green);
+    background:#101010;border:1px solid #2c2c2c;border-radius:6px;
+    padding:16px 18px;display:inline-block;
+  }
+  .flip .monthly-out span{color:var(--paper)}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid #2c2c2c;padding:30px 0 44px;font-size:.78rem;color:#8a8378}
+  footer .wrap{max-width:820px}
+  footer p+p{margin-top:8px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);border:0}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="brand" aria-label="Luxury versus Legacy">
+    <span class="lux strike">Luxury</span><span class="leg">Legacy</span>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <h1>That <span class="price-tag" id="heroPrice">$200</span> didn't cost $200.</h1>
+  <p>Every dollar spent on a toy they'll forget is a dollar that never got to grow up with them.
+     Enter the purchase. We'll print you the <strong>real receipt</strong>.</p>
+</section>
+
+<section class="wrap" aria-label="Calculator">
+  <div class="calc">
+    <div class="panel">
+      <h2>Ring It Up</h2>
+
+      <div class="field">
+        <label for="amt">Purchase amount</label>
+        <div class="money-input">
+          <span aria-hidden="true">$</span>
+          <input type="number" id="amt" min="1" max="1000000" step="1" value="200" inputmode="decimal">
+        </div>
+        <div class="chips" role="group" aria-label="Common purchases">
+          <button class="chip" data-amt="200">Baby Jordans · $200</button>
+          <button class="chip" data-amt="150">Toy haul · $150</button>
+          <button class="chip" data-amt="400">Designer fit · $400</button>
+          <button class="chip" data-amt="800">Christmas · $800</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="age">Your child's age</label>
+        <input type="number" class="no-prefix" id="age" min="0" max="17" step="1" value="3" inputmode="numeric">
+      </div>
+
+      <div class="field">
+        <label id="rateLabel">Assumed yearly return</label>
+        <div class="rate-row" role="group" aria-labelledby="rateLabel">
+          <button class="rate" data-rate="6" aria-pressed="false">6%<small>Careful</small></button>
+          <button class="rate" data-rate="8" aria-pressed="true">8%<small>Historical avg</small></button>
+          <button class="rate" data-rate="10" aria-pressed="false">10%<small>Optimistic</small></button>
+        </div>
+      </div>
+
+      <button class="run" id="run">Print the real receipt</button>
+    </div>
+
+    <div class="receipt-side">
+      <div class="receipt" id="receipt" aria-live="polite">
+        <div class="r-empty">Your receipt prints here.<br>&mdash; LEGACY DEPT. &mdash;</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="flip wrap">
+  <h3>Now flip it: make it a <em>habit</em>, not a purchase.</h3>
+  <p>One skipped splurge is a seed. The same amount moved every month is a forest.
+     Here's that same dollar figure, invested monthly until your child turns 18.</p>
+  <div class="monthly-out" id="monthlyOut"></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>How the math works:</b> future value = amount × (1 + rate)<sup>years</sup>, compounded annually. The monthly figure uses the standard future-value-of-a-series formula. 8% reflects the long-run historical average annual return of the U.S. stock market before inflation; past performance never guarantees future results.</p>
+    <p>This tool is for education and motivation, not financial advice. Talk to a licensed professional about your family's situation. Built by a parent, for parents. Luxury fades. Legacy compounds.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var amtEl = document.getElementById('amt');
+  var ageEl = document.getElementById('age');
+  var receipt = document.getElementById('receipt');
+  var monthlyOut = document.getElementById('monthlyOut');
+  var heroPrice = document.getElementById('heroPrice');
+  var rate = 0.08;
+
+  function money(n){
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+  function fv(p, r, yrs){ return p * Math.pow(1 + r, yrs); }
+  function fvMonthly(m, r, yrs){
+    var i = r / 12, n = yrs * 12;
+    return m * ((Math.pow(1 + i, n) - 1) / i);
+  }
+  function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+
+  function readInputs(){
+    var amt = clamp(parseFloat(amtEl.value) || 0, 0, 1000000);
+    var age = clamp(parseInt(ageEl.value, 10) || 0, 0, 17);
+    return { amt: amt, age: age };
+  }
+
+  function render(){
+    var v = readInputs();
+    if (v.amt <= 0){
+      receipt.innerHTML = '<div class="r-empty">Enter an amount above zero,<br>then print the receipt.</div>';
+      monthlyOut.textContent = '';
+      return;
+    }
+    heroPrice.textContent = money(v.amt);
+
+    var rows = '';
+    var targets = [
+      {label: 'AT 18 (COLLEGE)', yrs: 18 - v.age},
+      {label: 'AT 25 (FIRST HOME)', yrs: 25 - v.age},
+      {label: 'AT 40 (FREEDOM)', yrs: 40 - v.age},
+      {label: 'AT 65 (LEGACY)', yrs: 65 - v.age}
+    ];
+    targets.forEach(function(t){
+      if (t.yrs > 0){
+        rows += '<div class="r-line"><span>' + t.label + '</span><span class="pos">' + money(fv(v.amt, rate, t.yrs)) + '</span></div>';
+      }
+    });
+
+    var at65 = fv(v.amt, rate, 65 - v.age);
+    var now = new Date();
+    var stamp = (now.getMonth()+1) + '/' + now.getDate() + '/' + now.getFullYear();
+
+    receipt.innerHTML =
+      '<div class="r-head">' +
+        '<div class="r-store">LUXURY vs. LEGACY</div>' +
+        '<div class="r-sub">THE REAL RECEIPT — ' + stamp + '</div>' +
+      '</div>' +
+      '<div class="r-line"><span>ITEM AS PURCHASED</span><span class="neg">-' + money(v.amt) + '</span></div>' +
+      '<div class="r-line"><span>CHILD\'S AGE</span><span>' + v.age + '</span></div>' +
+      '<div class="r-line"><span>GROWTH RATE</span><span>' + (rate*100) + '%/YR</span></div>' +
+      '<div class="r-section">WHAT IT COULD HAVE BECOME</div>' +
+      rows +
+      '<div class="r-line total"><span>TRUE COST BY 65</span><span class="neg">' + money(at65) + '</span></div>' +
+      '<div class="r-note">The item will be outgrown, donated, or in a trash bag.<br>The money didn\'t have to be. <b>Luxury fades. Legacy compounds.</b></div>' +
+      '<div class="barcode" aria-hidden="true"></div>';
+
+    receipt.classList.remove('printing');
+    void receipt.offsetWidth; /* restart animation */
+    receipt.classList.add('printing');
+
+    var yrsTo18 = 18 - v.age;
+    if (yrsTo18 > 0){
+      monthlyOut.innerHTML = '<span>' + money(v.amt) + '/month until 18 &rarr;</span> ' + money(fvMonthly(v.amt, rate, yrsTo18));
+    } else {
+      monthlyOut.textContent = '';
+    }
+  }
+
+  document.getElementById('run').addEventListener('click', render);
+  [amtEl, ageEl].forEach(function(el){
+    el.addEventListener('keydown', function(e){ if (e.key === 'Enter') render(); });
+  });
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      amtEl.value = c.getAttribute('data-amt');
+      render();
+    });
+  });
+  document.querySelectorAll('.rate').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.rate').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      rate = parseFloat(b.getAttribute('data-rate')) / 100;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
