@@ -1,2 +1,1 @@
-# legacy-calculator
-Compound interest calculator for parents — see what that purchase really cost your child
+https://danielawosanya-jpg.github.io/legacy-calculator/
